@@ -1,0 +1,5 @@
+author: Noah Krause
+name: ${project.name}
+main: ${project.groupId}.${project.artifactId}
+description: DBlacklist
+version: ${project.version}

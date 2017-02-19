@@ -1,0 +1,12 @@
+com\minejunkie\blacklist\listener\PlayerListener.class
+com\minejunkie\blacklist\util\CommonUtils.class
+com\minejunkie\blacklist\util\CommandUtils.class
+com\minejunkie\blacklist\manager\DBManager.class
+com\minejunkie\blacklist\Database.class
+com\minejunkie\blacklist\mysql\MySQL.class
+com\minejunkie\blacklist\manager\DBManager$1$1.class
+com\minejunkie\blacklist\manager\DBManager$1.class
+com\minejunkie\blacklist\Blacklist$1.class
+com\minejunkie\blacklist\command\BlacklistCMD.class
+com\minejunkie\blacklist\manager\DBManager$Callback.class
+com\minejunkie\blacklist\Blacklist.class

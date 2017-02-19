@@ -1,0 +1,6 @@
+mysql:
+  hostname: 'localhost'
+  port: 3306
+  database: 'dblacklist'
+  username: 'root'
+  password: 'admin'
