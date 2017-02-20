@@ -22,9 +22,8 @@ public class PlayerListener implements Listener {
     @EventHandler
     public void onJoin(AsyncPlayerPreLoginEvent e) throws SQLException, ClassNotFoundException {
         UUID uuid = e.getUniqueId();
-        if (plugin.mysql.check("SELECT * FROM blacklists WHERE uuid LIKE '" + uuid.toString() + "';")) {
+        if (plugin.blacklisted.contains(uuid.toString().replaceAll("-", ""))) {
             e.disallow(Result.KICK_BANNED, ChatColor.RED + "You are blacklisted from the MineJunkie network.");
-
         }
     }
 }

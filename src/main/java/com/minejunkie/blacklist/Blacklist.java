@@ -31,12 +31,13 @@ public class Blacklist extends JavaPlugin {
     public Connection c;
     public MySQL mysql;
 
-    public ArrayList<UUID> blacklisted = new ArrayList<>();
+    public ArrayList<String> blacklisted = new ArrayList<>();
 
     /*
      * TODO
-     * Async
      * Unblacklist
+     * Async blacklisting for unknown UUIDs
+     * Clean
      */
 
 
@@ -80,7 +81,7 @@ public class Blacklist extends JavaPlugin {
             @Override
             public void onSuccess(ArrayList done) {
                 for (Object s : done) {
-                    blacklisted.add(UUID.fromString(s.toString()));
+                    blacklisted.add(s.toString().replaceAll("-", ""));
                 }
             }
 
