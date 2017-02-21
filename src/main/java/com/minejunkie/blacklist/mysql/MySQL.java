@@ -1,10 +1,10 @@
 package com.minejunkie.blacklist.mysql;
 
+import com.minejunkie.blacklist.Database;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-
-import com.minejunkie.blacklist.Database;
 
 /**
  * Connects to and uses a MySQL database

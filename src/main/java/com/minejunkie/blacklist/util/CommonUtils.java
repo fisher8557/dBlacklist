@@ -1,69 +1,54 @@
 package com.minejunkie.blacklist.util;
 
+import com.minejunkie.blacklist.Blacklist;
 import net.md_5.bungee.api.ChatColor;
-import org.bukkit.Material;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.util.ArrayList;
-import java.util.List;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.logging.Level;
 
 public class CommonUtils {
+
+    private final Connection c = Blacklist.getInstance().c;
 
     public String colorize(String input) {
         return ChatColor.translateAlternateColorCodes('&', input);
     }
 
-    public ItemStack createItemStack(Material material, int amount, String name, String... lore) {
-        ItemStack item = new ItemStack(material, amount);
-        ItemMeta im = item.getItemMeta();
-        im.setDisplayName(name);
-        if(im.hasLore()) {
-            if(!im.getLore().isEmpty()) {
-                im.getLore().clear();
-            }
-            for(String l : lore) {
-                im.getLore().add(l);
-            }
-        } else {
-            List<String> loreList = new ArrayList<>();
-            for(String l : lore) {
-                loreList.add(l);
-            }
-            im.setLore(loreList);
-        }
-        item.setItemMeta(im);
-        return item;
-    }
-
-    public boolean isFull(Player player) {
-        return (player.getInventory().firstEmpty() == -1);
-    }
-
-    public boolean isVowel(String s) {
-        return (s.startsWith("a") || s.startsWith("e") || s.startsWith("i") || s.startsWith("o") || s.startsWith("u"));
-    }
-
-    public boolean isInt(String s) {
+    public String readUrl(String urlString) throws Exception {
+        BufferedReader reader = null;
         try {
-            Integer.parseInt(s);
-        } catch(NumberFormatException e) {
-            return false;
-        } catch(NullPointerException e) {
-            return false;
+            URL url = new URL(urlString);
+            reader = new BufferedReader(new InputStreamReader(url.openStream()));
+            StringBuffer buffer = new StringBuffer();
+            int read;
+            char[] chars = new char[1024];
+            while ((read = reader.read(chars)) != -1)
+                buffer.append(chars, 0, read);
+            return buffer.toString();
+        } finally {
+            if (reader != null) reader.close();
         }
-
-        return true;
     }
 
-    public double round(double value, int places) {
-        if (places < 0) throw new IllegalArgumentException();
+    public void sendIfNotNull(Player player, String message) {
+        if (player != null) player.sendMessage(message);
+        else Bukkit.getLogger().log(Level.INFO, ChatColor.stripColor(message));
+    }
 
-        BigDecimal bd = new BigDecimal(value);
-        bd = bd.setScale(places, RoundingMode.HALF_UP);
-        return bd.doubleValue();
+    public PreparedStatement getInsertStatement(String name, String uuid, String targetIp, String senderName, String reason) throws SQLException {
+        final PreparedStatement pS = c.prepareStatement("INSERT INTO blacklists (name, uuid, ip, banned_by, reason) VALUES (?, ?, ?, ?, ?);");
+        pS.setString(1, name);
+        pS.setString(2, uuid);
+        pS.setString(3, targetIp);
+        pS.setString(4, senderName);
+        pS.setString(5, reason);
+        return pS;
     }
 }

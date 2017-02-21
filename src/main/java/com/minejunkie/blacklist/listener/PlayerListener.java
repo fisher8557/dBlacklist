@@ -7,12 +7,11 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent.Result;
 
-import java.sql.SQLException;
 import java.util.UUID;
 
 public class PlayerListener implements Listener {
 
-    private Blacklist plugin;
+    private final Blacklist plugin;
 
     public PlayerListener(Blacklist plugin) {
         this.plugin = plugin;
@@ -20,7 +19,7 @@ public class PlayerListener implements Listener {
     }
 
     @EventHandler
-    public void onJoin(AsyncPlayerPreLoginEvent e) throws SQLException, ClassNotFoundException {
+    public void onJoin(AsyncPlayerPreLoginEvent e) {
         UUID uuid = e.getUniqueId();
         if (plugin.blacklisted.contains(uuid.toString().replaceAll("-", ""))) {
             e.disallow(Result.KICK_BANNED, ChatColor.RED + "You are blacklisted from the MineJunkie network.");

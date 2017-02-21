@@ -7,16 +7,13 @@ import com.minejunkie.blacklist.mysql.MySQL;
 import com.sk89q.bukkit.util.BukkitCommandsManager;
 import com.sk89q.bukkit.util.CommandsManagerRegistration;
 import com.sk89q.minecraft.util.commands.*;
-import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.UUID;
 import java.util.logging.Level;
 
 public class Blacklist extends JavaPlugin {
@@ -31,12 +28,12 @@ public class Blacklist extends JavaPlugin {
     public Connection c;
     public MySQL mysql;
 
-    public ArrayList<String> blacklisted = new ArrayList<>();
+    public final ArrayList<String> blacklisted = new ArrayList<>();
 
     /*
      * TODO
      * Unblacklist
-     * Async blacklisting for unknown UUIDs
+     * Configurable Messages
      * Clean
      */
 
@@ -75,7 +72,7 @@ public class Blacklist extends JavaPlugin {
     /*
      * Creates ArrayList of blacklisted UUIDs.
      */
-    public void getBlacklisted() {
+    private void getBlacklisted() {
 
         dbManager.getBlacklisted(new DBManager.Callback<ArrayList>() {
             @Override
@@ -96,7 +93,7 @@ public class Blacklist extends JavaPlugin {
      * @return true if connection has been established.
      */
 
-    public boolean initDB() {
+    private boolean initDB() {
         String hostname = getConfig().getString("mysql.hostname"), database = getConfig().getString("mysql.database"), username = getConfig().getString("mysql.username"), password = getConfig().getString("mysql.password");
         int port = getConfig().getInt("mysql.port");
 
