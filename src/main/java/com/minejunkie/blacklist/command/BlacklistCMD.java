@@ -34,8 +34,7 @@ public class BlacklistCMD {
 
         /* Initialize all variables used */
         Player target = null, p = null;
-        boolean broadcast = !args.hasFlag('s');
-        final boolean blacklisted[] = new boolean[1];
+        boolean broadcast = !args.hasFlag('s'), blacklisted;
         /*                               */
 
         Bukkit.getServer().broadcastMessage((System.currentTimeMillis() - time) + "ms. [1]");
@@ -67,11 +66,11 @@ public class BlacklistCMD {
 
         Bukkit.getServer().broadcastMessage((System.currentTimeMillis() - time) + "ms. [3]");
 
-        blacklisted[0] = Blacklist.getInstance().blacklisted.contains(uuid);
+        blacklisted = Blacklist.getInstance().blacklisted.contains(uuid);
 
-        Bukkit.getServer().broadcastMessage("[3] Blacklist check has found to be " + blacklisted[0]);
+        Bukkit.getServer().broadcastMessage("[3] Blacklist check has found to be " + blacklisted);
 
-        if (blacklisted[0] && args.hasFlag('e')) {
+        if (blacklisted && args.hasFlag('e')) {
             dbManager.makeAsync(reason, name);
             util.sendIfNotNull(p, ChatColor.GREEN + name + (name.endsWith("s") ? "'" : "'s") + " reason has been updated.");
             return;
@@ -79,14 +78,15 @@ public class BlacklistCMD {
 
         Bukkit.getServer().broadcastMessage((System.currentTimeMillis() - time) + "ms. [4]");
 
-        if (!blacklisted[0]) {
+        if (!blacklisted) {
 
             if (args.hasFlag('e')) {
                 util.sendIfNotNull(p, ChatColor.RED + name + " is not blacklisted. The '-e' flag is used to edit.");
                 return;
             }
 
-            final PreparedStatement pS = util.getInsertStatement(name, uuid, (target != null ? target.getAddress().getHostName() : "undefined"), (p != null ? p.getName() : "CONSOLE"), reason);
+            assert target != null;
+            final PreparedStatement pS = util.getInsertStatement(name, uuid, target.getAddress().getHostName(), (p != null ? p.getName() : "CONSOLE"), reason);
             dbManager.makeAsync(pS);
 
             Bukkit.getServer().broadcastMessage((System.currentTimeMillis() - time) + "ms. [5]");
@@ -95,7 +95,7 @@ public class BlacklistCMD {
             Blacklist.getInstance().blacklisted.add(uuid);
 
             // Kick player if online
-            if (target != null) target.kickPlayer(ChatColor.RED + "You have been blacklisted from the MineJunkie network.");
+            target.kickPlayer(ChatColor.RED + "You have been blacklisted from the MineJunkie network.");
 
             Bukkit.getServer().broadcastMessage((System.currentTimeMillis() - time) + "ms. [6]");
 

@@ -77,7 +77,7 @@ public class DBManager {
         new BukkitRunnable() {
             @Override
             public void run() {
-                final NullPlayer[] nullPlayers = new NullPlayer[1];
+                NullPlayer nullPlayer;
                 String json = "";
                 try {
                     json = util.readUrl("https://api.mojang.com/users/profiles/minecraft/" + toFind);
@@ -88,15 +88,15 @@ public class DBManager {
                 Bukkit.getServer().broadcastMessage((System.currentTimeMillis() - time) + "ms. [1]");
 
 
-                if (json.isEmpty()) nullPlayers[0] = null;
-                nullPlayers[0] = gson.fromJson(json, NullPlayer.class);
+                if (json.isEmpty()) nullPlayer = null;
+                nullPlayer = gson.fromJson(json, NullPlayer.class);
 
                 Bukkit.getServer().broadcastMessage((System.currentTimeMillis() - time) + "ms. [2]");
 
                 String uuid = "", name = "";
-                if (nullPlayers[0] != null) {
-                    uuid = nullPlayers[0].getId();
-                    name = nullPlayers[0].getName();
+                if (nullPlayer != null) {
+                    uuid = nullPlayer.getId();
+                    name = nullPlayer.getName();
                 }
 
                 Bukkit.getServer().broadcastMessage((System.currentTimeMillis() - time) + "ms. [3]");
