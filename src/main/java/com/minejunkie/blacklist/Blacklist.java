@@ -1,6 +1,7 @@
 package com.minejunkie.blacklist;
 
 import com.minejunkie.blacklist.command.BlacklistCMD;
+import com.minejunkie.blacklist.command.UnblacklistCMD;
 import com.minejunkie.blacklist.listener.PlayerListener;
 import com.minejunkie.blacklist.manager.DBManager;
 import com.minejunkie.blacklist.mysql.MySQL;
@@ -120,6 +121,7 @@ public class Blacklist extends JavaPlugin {
         commands = new BukkitCommandsManager();
         cmdRegister = new CommandsManagerRegistration(this, this.commands);
         cmdRegister.register(BlacklistCMD.class);
+        cmdRegister.register(UnblacklistCMD.class);
 
     }
 

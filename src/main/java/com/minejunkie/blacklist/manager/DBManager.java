@@ -8,6 +8,7 @@ import com.sk89q.minecraft.util.commands.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -85,21 +86,15 @@ public class DBManager {
                     e.printStackTrace();
                 }
 
-                Bukkit.getServer().broadcastMessage((System.currentTimeMillis() - time) + "ms. [1]");
-
 
                 if (json.isEmpty()) nullPlayer = null;
                 nullPlayer = gson.fromJson(json, NullPlayer.class);
-
-                Bukkit.getServer().broadcastMessage((System.currentTimeMillis() - time) + "ms. [2]");
 
                 String uuid = "", name = "";
                 if (nullPlayer != null) {
                     uuid = nullPlayer.getId();
                     name = nullPlayer.getName();
                 }
-
-                Bukkit.getServer().broadcastMessage((System.currentTimeMillis() - time) + "ms. [3]");
 
                 if (uuid.isEmpty()) {
                     util.sendIfNotNull(sender, ChatColor.RED + "Invalid player name or could not reach uuid.");
@@ -127,41 +122,48 @@ public class DBManager {
                     }
                 }
 
-                Bukkit.getServer().broadcastMessage((System.currentTimeMillis() - time) + "ms. [4]");
             }
         }.runTaskAsynchronously(Blacklist.getInstance());
     }
 
     /**
-     * Checks if a player is blacklisted asynchronously.
-     * Not used, as storing a list of UUIDs is more efficient at login.
+     * Unblacklists a player asyncronously.
      *
-     * @param uuid Player's uuid to check.
-     * @param callback returns true if blacklisted, false otherwise.
+     * @param name Player's name to check.
+     * @param sender Player sending the unblacklist command.
      */
 
-    public void isBlacklisted(final String uuid, final Callback<Boolean> callback) {
-        new BukkitRunnable() {
+    public void unblacklistAsync(final String name, final Player sender) {
+        final BukkitTask bukkitTask = new BukkitRunnable() {
             /*    ASYNC    */
 
             @Override
             public void run() {
-                final boolean[] result = new boolean[1];
+                NullPlayer nullPlayer = null;
+                String json = "";
                 try {
-                    result[0] = m.check("SELECT * FROM blacklists WHERE uuid = '" + uuid + "';");
-                } catch (SQLException | ClassNotFoundException e) {
+                    json = util.readUrl("https://api.mojang.com/users/profiles/minecraft/" + name);
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
 
-                new BukkitRunnable() {
-                    /*    SYNC    */
+                if (json.isEmpty()) {
+                    util.sendIfNotNull(sender, ChatColor.RED + "User is not blacklisted!");
+                    return;
+                }
 
-                    @Override
-                    public void run() {
-                        Bukkit.getServer().broadcastMessage("Blacklist check has found to be " + result[0]);
-                        callback.onSuccess(result[0]);
-                    }
-                }.runTask(Blacklist.getInstance());
+                nullPlayer = gson.fromJson(json, NullPlayer.class);
+
+                String uuid = nullPlayer.getId();
+
+                if (Blacklist.getInstance().blacklisted.contains(uuid)) {
+                    Blacklist.getInstance().blacklisted.remove(uuid);
+                    try {
+                        m.updateSQL("DELETE FROM blacklists WHERE uuid='" + uuid + "'");
+                        util.sendIfNotNull(sender, ChatColor.GREEN + "User has successfully been unblacklisted.");
+                    } catch (SQLException | ClassNotFoundException e) { util.sendIfNotNull(sender, ChatColor.RED + "User was not found in the database!"); }
+                } else util.sendIfNotNull(sender, ChatColor.RED + "User is not blacklisted!");
+
             }
 
         }.runTaskAsynchronously(Blacklist.getInstance());

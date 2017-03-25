@@ -16,6 +16,7 @@ public class BlacklistCMD {
     @Command(
             aliases = "blacklist",
             desc = "Blacklist a player from joining the network.",
+            usage = "<name> <reason>",
             min = 1,
             max = -1,
             flags = ":es"
@@ -23,9 +24,6 @@ public class BlacklistCMD {
     @CommandPermissions("dblacklist.blacklist")
 
     public static void onBlacklistCMD(CommandContext args, CommandSender sender) throws SQLException {
-
-        // TEST
-        long time = System.currentTimeMillis();
 
         /*  Initialize all classes used  */
         DBManager dbManager = Blacklist.getInstance().dbManager;
@@ -36,9 +34,6 @@ public class BlacklistCMD {
         Player target = null, p = null;
         boolean broadcast = !args.hasFlag('s'), blacklisted;
         /*                               */
-
-        Bukkit.getServer().broadcastMessage((System.currentTimeMillis() - time) + "ms. [1]");
-
 
         final String name = args.getString(0);
         String uuid = "", reason = "";
@@ -57,26 +52,18 @@ public class BlacklistCMD {
 
         } catch (Exception e) { e.printStackTrace(); }
 
-        Bukkit.getServer().broadcastMessage((System.currentTimeMillis() - time) + "ms. [2]");
-
         if (uuid.equals("")) {
             util.sendIfNotNull(p, ChatColor.RED + "Invalid player name or could not reach uuid.");
             return;
         }
 
-        Bukkit.getServer().broadcastMessage((System.currentTimeMillis() - time) + "ms. [3]");
-
         blacklisted = Blacklist.getInstance().blacklisted.contains(uuid);
-
-        Bukkit.getServer().broadcastMessage("[3] Blacklist check has found to be " + blacklisted);
 
         if (blacklisted && args.hasFlag('e')) {
             dbManager.makeAsync(reason, name);
             util.sendIfNotNull(p, ChatColor.GREEN + name + (name.endsWith("s") ? "'" : "'s") + " reason has been updated.");
             return;
         }
-
-        Bukkit.getServer().broadcastMessage((System.currentTimeMillis() - time) + "ms. [4]");
 
         if (!blacklisted) {
 
@@ -89,17 +76,13 @@ public class BlacklistCMD {
             final PreparedStatement pS = util.getInsertStatement(name, uuid, target.getAddress().getHostName(), (p != null ? p.getName() : "CONSOLE"), reason);
             dbManager.makeAsync(pS);
 
-            Bukkit.getServer().broadcastMessage((System.currentTimeMillis() - time) + "ms. [5]");
-
             // Add uuid to list
             Blacklist.getInstance().blacklisted.add(uuid);
 
             // Kick player if online
-            target.kickPlayer(ChatColor.RED + "You have been blacklisted from the MineJunkie network.");
+            target.kickPlayer(util.colorize(Blacklist.getInstance().getConfig().getString("lang.blacklisted")));
 
-            Bukkit.getServer().broadcastMessage((System.currentTimeMillis() - time) + "ms. [6]");
-
-            if (broadcast) Bukkit.getServer().broadcastMessage(ChatColor.GREEN + name + " has been blacklisted" + (p != null ? " by " + p.getName() + "." : ".") + " in " + (System.currentTimeMillis() - time) + "ms. [7]");
+            if (broadcast) Bukkit.getServer().broadcastMessage(ChatColor.GREEN + name + " has been blacklisted" + (p != null ? " by " + p.getName() + "." : "."));
 
             util.sendIfNotNull(p, ChatColor.GREEN + "You have successfully blacklisted " + name + ".");
         } else {

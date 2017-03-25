@@ -1,8 +1,8 @@
 package com.minejunkie.blacklist.util;
 
 import com.minejunkie.blacklist.Blacklist;
-import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 import java.io.BufferedReader;

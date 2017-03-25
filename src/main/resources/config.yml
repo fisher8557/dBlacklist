@@ -4,3 +4,6 @@ mysql:
   database: 'dblacklist'
   username: 'root'
   password: 'admin'
+
+lang:
+  blacklisted: '&cYou have been blacklisted from the ___ network.'
